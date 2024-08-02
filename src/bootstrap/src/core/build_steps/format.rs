@@ -120,7 +120,9 @@ fn print_paths(verb: &str, adjective: Option<&str>, paths: &[String]) {
 pub fn format(build: &Builder<'_>, check: bool, all: bool, paths: &[PathBuf]) {
     if !paths.is_empty() {
         eprintln!(
-            "fmt error: path arguments are no longer accepted; use `--all` to format everything"
+            "fmt error: path arguments are no longer accepted;\n\
+             use `--all` to format everything, \
+             or directly invoke rustfmt on a specific file."
         );
         crate::exit!(1);
     };
