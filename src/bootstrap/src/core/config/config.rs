@@ -271,7 +271,7 @@ pub struct Config {
     pub mandir: Option<PathBuf>,
     pub codegen_tests: bool,
     pub nodejs: Option<PathBuf>,
-    pub npm: Option<PathBuf>,
+    pub pnpm: Option<PathBuf>,
     pub gdb: Option<PathBuf>,
     pub lldb: Option<PathBuf>,
     pub python: Option<PathBuf>,
@@ -462,6 +462,8 @@ impl Config {
             gdb: build_gdb,
             lldb: build_lldb,
             nodejs: build_nodejs,
+
+            pnpm: build_pnpm,
             npm: build_npm,
             python: build_python,
             windows_rc: build_windows_rc,
@@ -829,6 +831,12 @@ impl Config {
                 read_file_by_commit(&dwn_ctx, &rust_info, Path::new("src/ci/channel"), commit)
                     .trim()
                     .to_owned();
+        }
+
+        if build_npm.is_some() {
+            println!(
+                "WARNING: build.npm set in bootstrap.toml, this option no longer has any effect"
+            );
         }
 
         let mut lld_enabled = rust_lld_enabled.unwrap_or(false);
@@ -1382,7 +1390,6 @@ impl Config {
             musl_root: rust_musl_root.map(PathBuf::from),
             ninja_in_file: llvm_ninja.unwrap_or(true),
             nodejs: build_nodejs.map(PathBuf::from),
-            npm: build_npm.map(PathBuf::from),
             omit_git_hash,
             on_fail: flags_on_fail,
             optimized_compiler_builtins,
@@ -1390,6 +1397,7 @@ impl Config {
             patch_binaries_for_nix: build_patch_binaries_for_nix,
             path_modification_cache,
             paths: flags_paths,
+            pnpm: build_pnpm.map(PathBuf::from),
             prefix: install_prefix.map(PathBuf::from),
             print_step_rusage: build_print_step_rusage.unwrap_or(false),
             print_step_timings: build_print_step_timings.unwrap_or(false),
