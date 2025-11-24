@@ -12,9 +12,9 @@ If you have an issue with the actual content of the docs, use the "Documentation
 # Code
 <!-- problematic snippet and/or link to repo and/or full path of standard library function -->
 
-```rust
+````rust
 <code>
-```
+````
 
 # Reproduction Steps
 <!--
@@ -32,15 +32,18 @@ For GUI issues, feel free to provide a mockup image of what you want it to look 
 For diagnostics, please provide a mockup of the desired output in a code block.
 -->
 
-# Actual Output
+# Actual Outcome
 <!--
+Describe what happened.
+
+Info that is good to include if applicable:
 * rustdoc console output
 * browser screenshot of generated html
 * rustdoc json (prettify by running through `jq` or running thorugh an online formatter)
 -->
-```console
+````console
 <code>
-```
+````
 
 
 # Version
