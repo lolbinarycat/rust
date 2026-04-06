@@ -201,7 +201,18 @@ fn generate_item_with_correct_attrs(
                 Doc(d)
                 if d.inline.first().is_some_and(|(inline, _)| *inline == DocInline::Inline)
             ) || (is_glob_import(tcx, import_id)
-                && (cx.document_hidden() || !tcx.is_doc_hidden(def_id)));
+                && (cx.document_hidden() || !tcx.is_doc_hidden(def_id)))
+            || (matches!(tcx.def_kind(def_id), DefKind::Macro(MacroKinds::BANG))
+                && reexport_chain(tcx, import_id, def_id)
+                    .iter()
+                    .flat_map(|reexport| reexport.id())
+                    .any(|reexport_def_id| {
+                        find_attr!(
+                            inline::load_attrs(tcx, reexport_def_id),
+                            Doc(d)
+                            if d.inline.first().is_some_and(|(inline, _)| *inline == DocInline::Inline)
+                        )
+                    }));
             attrs.extend(get_all_import_attributes(cx, import_id, def_id, is_inline));
             is_inline = is_inline || import_is_inline;
         }

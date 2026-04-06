@@ -482,7 +482,21 @@ impl<'a, 'tcx> RustdocVisitor<'a, 'tcx> {
                             attrs,
                             Doc(d)
                             if d.inline.first().is_some_and(|(inline, _)| *inline == DocInline::Inline)
-                        );
+                        ) || res.opt_def_id().is_some_and(|res_did| {
+                            matches!(tcx.def_kind(res_did), DefKind::Macro(MacroKinds::BANG))
+                                && reexport_chain(tcx, item.owner_id.def_id, res_did)
+                                    .iter()
+                                    .flat_map(|reexport| reexport.id())
+                                    .filter_map(|id| id.as_local())
+                                    .any(|local_def_id| {
+                                        let chain_attrs = tcx.hir_attrs(tcx.local_def_id_to_hir_id(local_def_id));
+                                        find_attr!(
+                                            chain_attrs,
+                                            Doc(d)
+                                            if d.inline.first().is_some_and(|(inline, _)| *inline == DocInline::Inline)
+                                        )
+                                    })
+                        });
                         let ident = match kind {
                             hir::UseKind::Single(ident) => Some(ident.name),
                             hir::UseKind::Glob => None,
