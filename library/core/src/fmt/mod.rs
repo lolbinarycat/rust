@@ -1760,6 +1760,24 @@ impl PostPadding {
     }
 }
 
+macro_rules! methods_debug_struct_fieldn_finish {
+    ($($fn_name:ident($($name:ident, $value:ident),+) $n:literal);+;) => {
+        $(
+            /// Shrinks `derive(Debug)` code, for faster compilation and smaller
+            /// binaries. `debug_struct_fields_finish` is more general, but this is
+            #[doc = concat!("faster for ", $n, ".")]
+            #[doc(hidden)]
+            #[unstable(feature = "fmt_helpers_for_derive", issue = "none")]
+            pub fn $fn_name<'b>(&'b mut self, name: &str, $($name: &str, $value: &dyn Debug),+) -> Result {
+            let mut builder = builders::debug_struct_new(self, name);
+            $(
+                builder.field($name, $value);
+            )+
+            builder.finish()
+        })+
+    };
+}
+
 impl<'a> Formatter<'a> {
     fn wrap_buf<'b, 'c, F>(&'b mut self, wrap: F) -> Formatter<'c>
     where
@@ -2449,114 +2467,12 @@ impl<'a> Formatter<'a> {
         builders::debug_struct_new(self, name)
     }
 
-    /// Shrinks `derive(Debug)` code, for faster compilation and smaller
-    /// binaries. `debug_struct_fields_finish` is more general, but this is
-    /// faster for 1 field.
-    #[doc(hidden)]
-    #[unstable(feature = "fmt_helpers_for_derive", issue = "none")]
-    pub fn debug_struct_field1_finish<'b>(
-        &'b mut self,
-        name: &str,
-        name1: &str,
-        value1: &dyn Debug,
-    ) -> Result {
-        let mut builder = builders::debug_struct_new(self, name);
-        builder.field(name1, value1);
-        builder.finish()
-    }
-
-    /// Shrinks `derive(Debug)` code, for faster compilation and smaller
-    /// binaries. `debug_struct_fields_finish` is more general, but this is
-    /// faster for 2 fields.
-    #[doc(hidden)]
-    #[unstable(feature = "fmt_helpers_for_derive", issue = "none")]
-    pub fn debug_struct_field2_finish<'b>(
-        &'b mut self,
-        name: &str,
-        name1: &str,
-        value1: &dyn Debug,
-        name2: &str,
-        value2: &dyn Debug,
-    ) -> Result {
-        let mut builder = builders::debug_struct_new(self, name);
-        builder.field(name1, value1);
-        builder.field(name2, value2);
-        builder.finish()
-    }
-
-    /// Shrinks `derive(Debug)` code, for faster compilation and smaller
-    /// binaries. `debug_struct_fields_finish` is more general, but this is
-    /// faster for 3 fields.
-    #[doc(hidden)]
-    #[unstable(feature = "fmt_helpers_for_derive", issue = "none")]
-    pub fn debug_struct_field3_finish<'b>(
-        &'b mut self,
-        name: &str,
-        name1: &str,
-        value1: &dyn Debug,
-        name2: &str,
-        value2: &dyn Debug,
-        name3: &str,
-        value3: &dyn Debug,
-    ) -> Result {
-        let mut builder = builders::debug_struct_new(self, name);
-        builder.field(name1, value1);
-        builder.field(name2, value2);
-        builder.field(name3, value3);
-        builder.finish()
-    }
-
-    /// Shrinks `derive(Debug)` code, for faster compilation and smaller
-    /// binaries. `debug_struct_fields_finish` is more general, but this is
-    /// faster for 4 fields.
-    #[doc(hidden)]
-    #[unstable(feature = "fmt_helpers_for_derive", issue = "none")]
-    pub fn debug_struct_field4_finish<'b>(
-        &'b mut self,
-        name: &str,
-        name1: &str,
-        value1: &dyn Debug,
-        name2: &str,
-        value2: &dyn Debug,
-        name3: &str,
-        value3: &dyn Debug,
-        name4: &str,
-        value4: &dyn Debug,
-    ) -> Result {
-        let mut builder = builders::debug_struct_new(self, name);
-        builder.field(name1, value1);
-        builder.field(name2, value2);
-        builder.field(name3, value3);
-        builder.field(name4, value4);
-        builder.finish()
-    }
-
-    /// Shrinks `derive(Debug)` code, for faster compilation and smaller
-    /// binaries. `debug_struct_fields_finish` is more general, but this is
-    /// faster for 5 fields.
-    #[doc(hidden)]
-    #[unstable(feature = "fmt_helpers_for_derive", issue = "none")]
-    pub fn debug_struct_field5_finish<'b>(
-        &'b mut self,
-        name: &str,
-        name1: &str,
-        value1: &dyn Debug,
-        name2: &str,
-        value2: &dyn Debug,
-        name3: &str,
-        value3: &dyn Debug,
-        name4: &str,
-        value4: &dyn Debug,
-        name5: &str,
-        value5: &dyn Debug,
-    ) -> Result {
-        let mut builder = builders::debug_struct_new(self, name);
-        builder.field(name1, value1);
-        builder.field(name2, value2);
-        builder.field(name3, value3);
-        builder.field(name4, value4);
-        builder.field(name5, value5);
-        builder.finish()
+    methods_debug_struct_fieldn_finish! {
+        debug_struct_field1_finish(name1, value1) "1 field";
+        debug_struct_field2_finish(name1, value1, name2, value2) "2 fields";
+        debug_struct_field3_finish(name1, value1, name2, value2, name3, value3) "3 fields";
+        debug_struct_field4_finish(name1, value1, name2, value2, name3, value3, name4, value4) "4 fields";
+        debug_struct_field5_finish(name1, value1, name2, value2, name3, value3, name4, value4, name5, value5) "5 fields";
     }
 
     /// Shrinks `derive(Debug)` code, for faster compilation and smaller binaries.
